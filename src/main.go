@@ -14,7 +14,9 @@ func run(
 
 	log.Info().Str("Planet", "Earth").Msg("Hello world")
 
-	//TODO: Implement the service logic here. Likely this will involve
+	//TODO: Implement the service logic here. Likely this will involve creating a pub/sub and some main logic.
+	//      The de facto standard is to have some read (zmq/IO), some handling logic (may be several items),
+	//      and some write (zmq/IO). The go routines typically communicate via channels.
 
 	return nil
 }
