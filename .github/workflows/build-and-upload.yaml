@@ -19,6 +19,9 @@ jobs:
 
     - name: Set REPO_NAME environment variable
       run: echo "REPO_NAME=$(echo $GITHUB_REPOSITORY | cut -d '/' -f 2)" >> $GITHUB_ENV
+    
+    - name: Zip binary and service.yaml
+      run: zip ${{ env.REPO_NAME }}.zip -j ./bin/${{ env.REPO_NAME }} service.yaml
 
     - name: Get release
       id: get_release
@@ -33,6 +36,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: ./bin/${{ env.REPO_NAME }}
-        asset_name: ${{ env.REPO_NAME }}
+        asset_path: ${{ env.REPO_NAME }}.zip
+        asset_name: ${{ env.REPO_NAME }}.zip
         asset_content_type: application/zip
