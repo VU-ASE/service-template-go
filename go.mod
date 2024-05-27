@@ -3,8 +3,8 @@ module vu/ase/ENTERYOURMODULENAMEHERE
 go 1.21.6
 
 require (
-	github.com/VU-ASE/pkg-CommunicationDefinitions/v2 v2.12.0
-	github.com/VU-ASE/pkg-ServiceRunner/v2 v2.10.0
+	github.com/VU-ASE/pkg-CommunicationDefinitions/v2 v2.24.0
+	github.com/VU-ASE/pkg-ServiceRunner/v2 v2.13.0
 	github.com/rs/zerolog v1.31.0
 )
 
