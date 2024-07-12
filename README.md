@@ -1,4 +1,4 @@
-# template: Go module
+# template: Go Service
 
 This repository serves as a template repository which can be cloned to get you set up quickly. It can be used to write utilities, modules and packages in Go. The following will be set up for you when you use this template:
 
