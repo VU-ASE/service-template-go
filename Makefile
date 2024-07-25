@@ -6,7 +6,7 @@ BINARY_NAME=ChangeThisToRepoName
 
 lint:
 	@echo "Lint check..."
-	golangci-lint run
+	@golangci-lint run
 
 build: lint
 	@echo "building ${BINARY_NAME}"
