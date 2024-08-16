@@ -1,4 +1,4 @@
-module github.com/VU-ASE/name
+module $SERVICE_SOURCE
 
 go 1.22.0
 
