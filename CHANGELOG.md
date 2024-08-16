@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.1](https://github.com/VU-ASE/service-template-go/compare/v1.0.0...v1.0.1) (2024-08-16)
+
+
+### Bug Fixes
+
+* linting step not part of build and test ([edd6c22](https://github.com/VU-ASE/service-template-go/commit/edd6c226d6c99856a270272f0fa2088b3eeea131))
+* rename, always use .yaml ([0f3bb46](https://github.com/VU-ASE/service-template-go/commit/0f3bb464191fd3232a8abfe384e3449c82c398f3))
+* updated to use reusable actions ([b1f8c52](https://github.com/VU-ASE/service-template-go/commit/b1f8c525ac8237ff3af2f703e67a9e0b825b1a4e))
+* upgraded deps ([4d975f9](https://github.com/VU-ASE/service-template-go/commit/4d975f99af27b1223e2e90e31878651de055245c))
+* version bumped deps ([ea33026](https://github.com/VU-ASE/service-template-go/commit/ea3302671bf635648c98094255ce7700bde96661))
+
 ## 1.0.0 (2024-04-07)
 
 
