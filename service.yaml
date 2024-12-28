@@ -1,44 +1,28 @@
-# Template for a service configuration in the ASE Rover platform, 
-# as parsed by the ASE roverlib and rovertui tools.
+name: service-template-go-two
+author: ase-dev
+source: https://github.com/vu-ase/imaging
+version: 1.0.1
+description: Write a Rover service in Go
 
-# Service identity
-name: $SERVICE_NAME
-author: $SERVICE_AUTHOR
-source: $SERVICE_SOURCE
-version: $SERVICE_VERSION
-
-# The rover will execute these commands to build and start the service
-# NB: they will be executed from the service folder, where the service.yaml file is located
 commands:
-  build: make build # you can omit this if there is no build step involved
-  run: ./bin/$SERVICE_NAME
+  build: make build
+  run: ./bin/SERVICE_NAME
 
-# Do we need to inject the roverlib into the environment of the service?
-inject_roverlib: false
-
-# From each service, describe which stream we are interested in
 inputs:
-  # - service: imaging
-  #   streams:
-  #     - track
-  #     - debug
-  # - service: controller
-  #   streams:
-  #     - decision
-    
-# The names of the streams that this service will produce
+  - service: example-input
+    streams:
+      - rpm-data
 outputs:
-  # - trajectory
-  # - debugdata
+  - example-output
 
-# Here you define options values that can be accessed during runtime, by the roverlib
 configuration:
-  # - name: speed
-  #   value: 1.0
-  # - name: ki
-  #   value: 123
-  #   tunable: true # do you want to be able to change this value during runtime?
-  # - name: kp
-  #   value: 456
-  #   tunable: true
-  #   type: string # override the auto-detected type (can be string/int/float)
+  - name: number-example
+    type: number
+    value: 30
+  - name: string-example
+    type: string
+    value: "hello all"
+  - name: tunable-string-example
+    type: string
+    value: "hello all, this is tunable"
+    tunable: true
