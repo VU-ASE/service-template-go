@@ -143,7 +143,6 @@ func onTerminate(sig os.Signal) error {
 
 // This is just a wrapper to run the user program
 // it is not recommended to put any other logic here
-// (replace exampleRun1 with your own run function)
 func main() {
 	roverlib.Run(run, onTerminate)
 }
