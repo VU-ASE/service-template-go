@@ -1,8 +1,8 @@
-name: service-template-go-two
-author: ase-dev
-source: https://github.com/vu-ase/imaging
+name: SERVICE_NAME
+author: SERVICE_AUTHOR
+source: SERVICE_SOURCE
 version: 1.0.1
-description: Write a Rover service in Go
+description: A template service in Go
 
 commands:
   build: make build
