@@ -14,117 +14,111 @@ import (
 // The main user space program
 // this program has all you need from roverlib: service identity, reading, writing and configuration
 func run(service roverlib.Service, configuration *roverlib.ServiceConfiguration) error {
+	//
+	// Get configuration values
+	//
 	if configuration == nil {
-		return fmt.Errorf("configuration cannot be accessed")
+		return fmt.Errorf("Configuration cannot be accessed")
 	}
 
 	//
 	// Access the service identity, who am I?
 	//
-	log.Info().Msgf("Hello world, a new service '%s' was born at version %s", *service.Name, *service.Version)
+	log.Info().Msgf("Hello world, a new Go service '%s' was born at version %s", *service.Name, *service.Version)
 
 	//
 	// Access the service configuration, to use runtime parameters
 	//
-	exampleNum, err := configuration.GetFloatSafe("number-example")
+	tunableSpeed, err := configuration.GetFloatSafe("speed")
 	if err != nil {
-		return fmt.Errorf("failed to get configuration: %v", err)
+		return fmt.Errorf("Failed to get configuration: %v", err)
 	}
-	log.Info().Msgf("Fetched runtime configuration example number: %f", exampleNum)
-
-	exampleString, err := configuration.GetStringSafe("string-example")
-	if err != nil {
-		return fmt.Errorf("failed to get configuration: %v", err)
-	}
-	log.Info().Msgf("Fetched runtime configuration example string: %s", exampleString)
-
-	exampleStringTunable, err := configuration.GetStringSafe("tunable-string-example")
-	if err != nil {
-		return fmt.Errorf("failed to get configuration: %v", err)
-	}
-	log.Info().Msgf("Fetched runtime configuration example tunable string: %s", exampleStringTunable)
-
-	//
-	// Writing to an output that other services can read (see service.yaml to understand the output name)
-	//
-	writeStream := service.GetWriteStream("example-output")
-	if writeStream == nil {
-		return fmt.Errorf("failed to get write stream")
-	}
-
-	// Try to write a simple rovercom message, as if we are sending RPM data
-	err = writeStream.Write(&pb_outputs.SensorOutput{
-		SensorId:  404,                            // let the receiver know who we are! (if you have multiple sensors in one service)
-		Timestamp: uint64(time.Now().UnixMilli()), // current time in milliseconds (useful for debugging)
-		Status:    0,                              // we are chilling
-		SensorOutput: &pb_outputs.SensorOutput_RpmOuput{
-			RpmOuput: &pb_outputs.RpmSensorOutput{
-				LeftRpm:  1000,
-				RightRpm: 1200,
-			},
-		},
-	})
-	if err != nil {
-		return fmt.Errorf("failed to write to stream: %v", err)
-	}
-
-	// You don't like using protobuf messages? No problem, you can write raw bytes too
-	err = writeStream.WriteBytes([]byte("Hello world!"))
-	if err != nil {
-		return fmt.Errorf("failed to write to stream: %v", err)
-	}
+	log.Info().Msgf("Fetched runtime configuration example tunable number: %f", tunableSpeed)
 
 	//
 	// Reading from an input, to get data from other services (see service.yaml to understand the input name)
 	//
-	readStream := service.GetReadStream("example-input", "rpm-data")
+	readStream := service.GetReadStream("imaging", "path")
 	if readStream == nil {
-		return fmt.Errorf("failed to get read stream")
-	}
-
-	// Try to read a simple rovercom message, as if we are receiving RPM data
-	pbData, err := readStream.Read()
-	if err != nil {
-		log.Error().Msgf("failed to read from stream: %v", err)
-	} else {
-		// Find out if we actually have rpm data
-		if pbData.GetRpmOuput() == nil {
-			log.Error().Msgf("expected RPM data, but got something else")
-		} else {
-			log.Info().Msgf("Received RPM data: %f, %f", pbData.GetRpmOuput().GetLeftRpm(), pbData.GetRpmOuput().GetRightRpm())
-		}
-	}
-
-	// You don't like using protobuf messages? No problem, you can read raw bytes too
-	rawData, err := readStream.ReadBytes()
-	if err != nil {
-		log.Error().Msgf("failed to read from stream: %v", err)
-	} else {
-		log.Info().Msgf("Received raw data: %s", string(rawData))
+		return fmt.Errorf("Failed to get read stream")
 	}
 
 	//
-	// Now do something else fun, see if our "example-string-tunable" is updated
+	// Writing to an output that other services can read (see service.yaml to understand the output name)
 	//
-	curr := exampleStringTunable
+	writeStream := service.GetWriteStream("decision")
+	if writeStream == nil {
+		return fmt.Errorf("Failed to create write stream 'decision'")
+	}
+
 	for {
-		log.Info().Msg("Checking for tunable string update")
+		//
+		// Reading one message from the stream
+		//
+		data, err := readStream.Read()
+		if data == nil || err != nil {
+			return fmt.Errorf("Failed to read from 'imaging' service")
+		}
+
+		// When did the imaging service create this message?
+		createdAt := data.Timestamp
+		log.Info().Msgf("Recieved message with timestamp: %d", createdAt)
+
+		// Get the imaging data
+		imagingData := data.GetCameraOutput()
+		if imagingData == nil {
+			return fmt.Errorf("Message does not contain camera output. What did imaging do??")
+		}
+		log.Info().Msgf("Imaging service captured a %d by %d image", imagingData.Trajectory.Width, imagingData.Trajectory.Height)
+
+		// Print the X and Y coordinates of the middle point of the track that Imaging has detected
+		log.Info().Msgf("The X: %d and Y: %d values of the middle point of the track", imagingData.Trajectory.Points[0].X, imagingData.Trajectory.Points[0].Y)
+
+		// This value holds the steering position that we want to pass to the servo (-1 = left, 0 = center, 1 = right)
+		steerPosition := float32(-0.5)
+
+		// Initialize the message that we want to send to the actuator
+		actuatorMsg := pb_outputs.SensorOutput{
+			Timestamp: uint64(time.Now().UnixMilli()), // milliseconds since epoch
+			Status:    0,                              // all is well
+			SensorId:  1,                              
+			SensorOutput: &pb_outputs.SensorOutput_ControllerOutput{
+				ControllerOutput: &pb_outputs.ControllerOutput{
+					SteeringAngle: steerPosition,
+					LeftThrottle:  float32(tunableSpeed),
+					RightThrottle: float32(tunableSpeed),
+					FanSpeed:      0,
+					FrontLights:   false,
+				},
+			},
+		}
+
+		// Send the message to the actuator
+		err = writeStream.Write(&actuatorMsg)
+		if err != nil {
+			log.Warn().Err(err).Msg("Could not write to actuator")
+		}
+
+		//
+		// Now do something else fun, see if our "tunable_speed" is updated
+		//
+		curr := tunableSpeed
+
+		log.Info().Msg("Checking for tunable number update")
 
 		// We are not using the safe version here, because using locks is boring
 		// (this is perfectly fine if you are constantly polling the value)
 		// nb: this is not a blocking call, it will return the last known value
-		newVal, err := configuration.GetString("tunable-string-example")
+		newVal, err := configuration.GetFloat("speed")
 		if err != nil {
-			return fmt.Errorf("failed to get configuration: %v", err)
+			return fmt.Errorf("Failed to get updated tunable number: %v", err)
 		}
 
 		if curr != newVal {
-			log.Info().Msgf("Tunable string updated: %s -> %s", curr, newVal)
+			log.Info().Msgf("Tunable number updated: %s -> %s", curr, newVal)
 			curr = newVal
 		}
-
-		// Don't waste CPU cycles
-		time.Sleep(1 * time.Second)
+		tunableSpeed = curr
 	}
 }
 
