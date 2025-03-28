@@ -72,7 +72,11 @@ func run(service roverlib.Service, configuration *roverlib.ServiceConfiguration)
 		log.Info().Msgf("Imaging service captured a %d by %d image", imagingData.Trajectory.Width, imagingData.Trajectory.Height)
 
 		// Print the X and Y coordinates of the middle point of the track that Imaging has detected
-		log.Info().Msgf("The X: %d and Y: %d values of the middle point of the track", imagingData.Trajectory.Points[0].X, imagingData.Trajectory.Points[0].Y)
+		if len(imagingData.Trajectory.Points) > 0 {
+			log.Info().Msgf("The X: %d and Y: %d values of the middle point of the track", imagingData.Trajectory.Points[0].X, imagingData.Trajectory.Points[0].Y)
+		} else {
+			log.Info().Msgf("imaging could didn't detect track edges. Is the Rover on the track?")
+		}
 
 		// This value holds the steering position that we want to pass to the servo (-1 = left, 0 = center, 1 = right)
 		steerPosition := float32(-0.5)
