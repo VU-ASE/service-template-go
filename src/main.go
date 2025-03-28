@@ -115,7 +115,7 @@ func run(service roverlib.Service, configuration *roverlib.ServiceConfiguration)
 		}
 
 		if curr != newVal {
-			log.Info().Msgf("Tunable number updated: %s -> %s", curr, newVal)
+			log.Info().Msgf("Tunable number updated: %f -> %f", curr, newVal)
 			curr = newVal
 		}
 		tunableSpeed = curr
