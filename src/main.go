@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	pb_outputs "github.com/VU-ASE/rovercom/packages/go/outputs"
-	roverlib "github.com/VU-ASE/roverlib-go/src"
+	pb_outputs "github.com/VU-ASE/rovercom/v2/packages/go/outputs"
+	roverlib "github.com/VU-ASE/roverlib-go/v2/src"
 
 	"github.com/rs/zerolog/log"
 )
@@ -69,11 +69,11 @@ func run(service roverlib.Service, configuration *roverlib.ServiceConfiguration)
 		if imagingData == nil {
 			return fmt.Errorf("Message does not contain camera output. What did imaging do??")
 		}
-		log.Info().Msgf("Imaging service captured a %d by %d image", imagingData.Trajectory.Width, imagingData.Trajectory.Height)
+		log.Info().Msgf("Imaging service captured a %d by %d image", imagingData.Resolution.Width, imagingData.Resolution.Height)
 
 		// Print the X and Y coordinates of the middle point of the track that Imaging has detected
-		if len(imagingData.Trajectory.Points) > 0 {
-			log.Info().Msgf("The X: %d and Y: %d values of the middle point of the track", imagingData.Trajectory.Points[0].X, imagingData.Trajectory.Points[0].Y)
+		if len(imagingData.HorizontalScans) > 0 {
+			log.Info().Msgf("The left side of the track is at X: %d, and the right side of the track is at X: %d. Both are at Y: %d", imagingData.HorizontalScans[0].XLeft, imagingData.HorizontalScans[0].XRight, imagingData.HorizontalScans[0].Y)
 		} else {
 			log.Info().Msgf("imaging could didn't detect track edges. Is the Rover on the track?")
 		}
@@ -85,7 +85,7 @@ func run(service roverlib.Service, configuration *roverlib.ServiceConfiguration)
 		actuatorMsg := pb_outputs.SensorOutput{
 			Timestamp: uint64(time.Now().UnixMilli()), // milliseconds since epoch
 			Status:    0,                              // all is well
-			SensorId:  1,                              
+			SensorId:  1,
 			SensorOutput: &pb_outputs.SensorOutput_ControllerOutput{
 				ControllerOutput: &pb_outputs.ControllerOutput{
 					SteeringAngle: steerPosition,
