@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.0](https://github.com/VU-ASE/service-template-go/compare/v1.1.0...v2.0.0) (2025-07-31)
+
+
+### ⚠ BREAKING CHANGES
+
+* upgrade to rovercom V2
+
+### Features
+
+* upgrade to rovercom V2 ([da60524](https://github.com/VU-ASE/service-template-go/commit/da60524a209ac4854465591e238fc7dbefb6f49a))
+
+
+### Bug Fixes
+
+* release-please PR eternally expected ([a2fc50b](https://github.com/VU-ASE/service-template-go/commit/a2fc50bdce2156ba66eb567787d4a5d122834777))
+
 ## [1.1.0](https://github.com/VU-ASE/service-template-go/compare/v1.0.0...v1.1.0) (2025-03-29)
 
 
